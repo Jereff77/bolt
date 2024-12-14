@@ -1,21 +1,33 @@
+# Use Node.js 18 Alpine as base image
 FROM node:18-alpine
 
+# Install git and other dependencies
+RUN apk add --no-cache git
+
+# Set working directory
 WORKDIR /app
 
-# Instalar pnpm
+# Install pnpm globally
 RUN npm install -g pnpm@9.4.0
 
-# Copiar archivos del proyecto
+# Copy package files
+COPY package.json pnpm-lock.yaml* ./
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy the rest of the application
 COPY . .
 
-# Instalar dependencias
-RUN pnpm install
-
-# Construir la aplicación
+# Build the application
 RUN pnpm build
 
-# Exponer el puerto (ajusta según sea necesario)
+# Expose port 3000
 EXPOSE 3000
 
-# Comando para iniciar la aplicación
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Start the application
 CMD ["pnpm", "start"]
