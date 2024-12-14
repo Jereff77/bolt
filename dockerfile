@@ -1,37 +1,37 @@
-# Use Node.js 18 Alpine as base image
 FROM node:18-alpine
 
-# Install git and other dependencies
-RUN apk add --no-cache git bash
-
-# Set working directory
 WORKDIR /app
 
-# Install pnpm globally
+# Install basic dependencies
+RUN apk add --no-cache git bash
+
+# Install pnpm
 RUN npm install -g pnpm@9.4.0
 
-# Copy package files and scripts
-COPY package.json pnpm-lock.yaml* bindings.sh ./
+# Copy package files
+COPY package.json ./
+COPY pnpm-lock.yaml ./
+COPY .env.local ./
+COPY bindings.sh ./
+
+# Make bindings.sh executable
 RUN chmod +x bindings.sh
 
-# Copy env file
-COPY .env.local ./
-
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+RUN pnpm install
 
-# Copy the rest of the application
+# Copy application files
 COPY . .
 
-# Build the application
+# Build
 RUN pnpm build
 
-# Expose port 3000
+# Expose port
 EXPOSE 3000
 
-# Set environment variables
+# Environment variables
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Start the application
+# Start
 CMD ["pnpm", "start"]
