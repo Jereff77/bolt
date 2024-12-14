@@ -2,7 +2,7 @@
 FROM node:18-alpine
 
 # Install git and other dependencies
-RUN apk add --no-cache git
+RUN apk add --no-cache git bash
 
 # Set working directory
 WORKDIR /app
@@ -10,8 +10,12 @@ WORKDIR /app
 # Install pnpm globally
 RUN npm install -g pnpm@9.4.0
 
-# Copy package files
-COPY package.json pnpm-lock.yaml* ./
+# Copy package files and scripts
+COPY package.json pnpm-lock.yaml* bindings.sh ./
+RUN chmod +x bindings.sh
+
+# Copy env file
+COPY .env.local ./
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
